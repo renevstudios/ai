@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html class="notranslate" translate="no" lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+    <meta name="description" content="Renev AI - A powerful AI assistant developed by Renev Official">
+    <title>Renev AI</title>
+    <link rel="icon" type="image/png" href="https://i.imgur.com/iU0WQuj.png">
+    <link rel="icon" type="image/png" href="https://i.imgur.com/iU0WQuj.png" media="(prefers-color-scheme: light)">
+    <link rel="icon" type="image/png" href="https://i.imgur.com/LoRvwW2.png" media="(prefers-color-scheme: dark)">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="ai.css">
+
+</head>
+<body>
+    <header>
+        <nav class="navigation" role="navigation" aria-label="Main navigation">
+            <div class="nav-left">
+                <button class="nav-button export" onclick="exportChat()" aria-label="Export chat">
+                    <i class="bi bi-download"></i>
+                </button>
+                <button class="nav-button import" onclick="importChat()" aria-label="Import chat">
+                    <i class="bi bi-upload"></i>
+                </button>
+            </div>
+            <div class="nav-right">
+                <button class="nav-button" onclick="showSettingsModal()" aria-label="Settings">
+                    <i class="bi bi-gear-wide-connected"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container" role="main">
+        <div class="chat-messages" id="chatMessages" role="log" aria-live="polite"></div>
+    </main>
+
+    <div class="chat-input-container">
+        <input type="file" id="fileUpload" style="display: none;" onchange="handleFileUpload(event)">
+        <button onclick="triggerFileUpload()" aria-label="Attach file">
+            <i class="bi bi-paperclip"></i>
+        </button>
+        <textarea 
+            id="messageInput" 
+            placeholder="Type your message..." 
+            enterkeyhint="send"
+            aria-label="Message input"
+            role="textbox"
+            aria-multiline="true"></textarea>
+        <button onclick="sendMessage()" aria-label="Send message">
+            <i class="bi bi-send-fill"></i>
+        </button>
+    </div>
+
+    <footer>
+        <div id="filePreview" role="region" aria-label="File preview">
+            <button id="clearFileButton" onclick="clearFile()" aria-label="Remove file">
+                <span class="material-icons" aria-hidden="true">close</span>
+            </button>
+        </div>
+    </footer>
+
+    <!-- Welcome Modal -->
+    <div class="modal-overlay" id="welcomeModal" role="dialog" aria-labelledby="welcomeTitle" style="display: none;">
+        <div class="modal-window">
+            <h2 id="welcomeTitle" class="modal-title">Welcome to Renev AI</h2>
+            <p class="modal-text">I am a powerful AI assistant, developed by Renev. Click below to get started.</p>
+            <div class="modal-action-button" onclick="closeWelcomeModal()">
+                <div class="modal-button-text">Get Started</div>
+                <div class="modal-button-icon">
+                    <i class="bi bi-arrow-up-right"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal" role="dialog" aria-labelledby="settingsTitle" style="display: none;">
+        <div class="modal-window">
+            <h2 id="settingsTitle" class="modal-title">Settings</h2>
+            <div class="settings-options">
+                <div class="settings-button" onclick="showLanguageModal()">
+                    <div class="settings-button-icon"><i class="bi bi-translate"></i></div>
+                    <div class="settings-button-text" data-translate="language">Response Language</div>
+                </div>
+                <div class="settings-button" onclick="showModelModal()">
+                    <div class="settings-button-icon"><i class="bi bi-box-seam"></i></div>
+                    <div class="settings-button-text" data-translate="chooseModel">Choose Model</div>
+                </div>
+                <div class="settings-button" onclick="resetChat()">
+                    <div class="settings-button-icon"><i class="bi bi-arrow-repeat"></i></div>
+                    <div class="settings-button-text" data-translate="resetChat">Reset Chat</div>
+                </div>
+                <div class="settings-button" onclick="handleContact()">
+                    <div class="settings-button-icon"><i class="bi bi-envelope-at-fill"></i></div>
+                    <div class="settings-button-text" data-translate="contact">Contact</div>
+                </div>
+                <div class="settings-button" onclick="window.close()">
+                    <div class="settings-button-icon"><i class="bi bi-x"></i></div>
+                    <div class="settings-button-text" data-translate="closeProgram">Close Program</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Language Modal -->
+    <div class="modal-overlay" id="languageModal" role="dialog" aria-labelledby="languageTitle" style="display: none;">
+        <div class="modal-window">
+            <h2 id="languageTitle" class="modal-title">Response Language</h2>
+            <input type="text" id="languageInput" class="language-input" placeholder="Or type a language...">
+        </div>
+    </div>
+
+    <!-- Model Modal -->
+    <div class="modal-overlay" id="modelModal" role="dialog" aria-labelledby="modelTitle" style="display: none;">
+        <div class="modal-window">
+            <h2 id="modelTitle" class="modal-title">Choose AI Model</h2>
+            <div class="settings-options">
+                <div class="settings-button" onclick="setModel('gemini-2.5-pro')">
+                    <div class="settings-button-text">Renev Klyx Pro</div>
+                </div>
+                <div class="settings-button" onclick="setModel('gemini-2.5-flash')">
+                    <div class="settings-button-text">Renev Klyx</div>
+                </div>
+                <div class="settings-button" onclick="setModel('gemini-2.0-flash')">
+                    <div class="settings-button-text">Renev Zenit (Default)</div>
+                </div>
+                <div class="settings-button" onclick="setModel('gemini-2.0-flash-lite')">
+                    <div class="settings-button-text">Renev Zenit Lite</div>
+                </div>
+                <div class="settings-button" onclick="setModel('gemini-1.5-flash')">
+                    <div class="settings-button-text">Renev Frix</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="ai.js"></script>
+</body>
+</html>
